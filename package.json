@@ -1,0 +1,15 @@
+{
+  "name": "whyguard-demo",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Checkout service used to demonstrate WhyGuard",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "5.7.2",
+    "vitest": "3.2.7"
+  }
+}
