@@ -26,6 +26,13 @@ export async function createOrder(
   idempotencyKey: string,
   deps: CreateOrderDeps,
 ): Promise<Order> {
+  // One idempotency key creates at most one order. A retried checkout must get the
+  // original order back, not a second one with a second capture.
+  const existing = deps.store.findByIdempotencyKey(idempotencyKey);
+  if (existing) {
+    return existing;
+  }
+
   const order: Order = {
     id: deps.newOrderId(),
     cartId: cart.id,
