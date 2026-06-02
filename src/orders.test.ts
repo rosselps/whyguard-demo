@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createOrder, type CreateOrderDeps, type Order } from "./orders.js";
+import { capturePayment, GatewayError, RETRY_BACKOFF_MS } from "./payments.js";
 
 function inMemoryDeps(): CreateOrderDeps & { captures: number } {
   const saved: Order[] = [];
@@ -48,5 +49,22 @@ describe("createOrder", () => {
 
     expect(second.id).not.toBe(first.id);
     expect(deps.captures).toBe(2);
+  });
+});
+
+// Guards against a silent regression in the retry interval: see #2.
+describe("payment retry interval", () => {
+  it("waits at least the gateway minimum between attempts", async () => {
+    expect(RETRY_BACKOFF_MS).toBeGreaterThanOrEqual(2000);
+
+    let attempts = 0;
+    const send = async () => {
+      attempts += 1;
+      if (attempts === 1) throw new GatewayError("rate limited", true);
+    };
+
+    const result = await capturePayment(4990, "USD", "key_1", send);
+
+    expect(result).toEqual({ captured: true, attempts: 2 });
   });
 });

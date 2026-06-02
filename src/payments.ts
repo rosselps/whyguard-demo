@@ -2,6 +2,12 @@ export type CaptureResult = { captured: boolean; attempts: number };
 
 export const MAX_ATTEMPTS = 3;
 
+/**
+ * Gateway minimum. Below 2000ms the gateway treats the retry as an independent call and
+ * can capture twice. This is a constraint they confirmed, not a tuning knob.
+ */
+export const RETRY_BACKOFF_MS = 2000;
+
 export class GatewayError extends Error {
   constructor(
     message: string,
@@ -30,7 +36,7 @@ export async function capturePayment(
     } catch (error) {
       lastError = error;
       if (!(error instanceof GatewayError) || !error.retryable) throw error;
-      if (attempt < MAX_ATTEMPTS) await sleep(200);
+      if (attempt < MAX_ATTEMPTS) await sleep(RETRY_BACKOFF_MS);
     }
   }
 
