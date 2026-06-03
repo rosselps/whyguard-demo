@@ -1,0 +1,56 @@
+# WhyGuard rationale contract — TEMPLATE (inactive)
+#
+# A rationale contract is how you tell WhyGuard "this behavior exists on purpose".
+# It is the strongest evidence the tool accepts: with an active contract, removing the
+# behavior becomes a BLOCK instead of a warning, because a human already confirmed why
+# the code is there.
+#
+# To use it:
+#   1. Copy this file to a real name, e.g. .whyguard/decisions/payment-idempotency.yml
+#   2. Fill in the real file, symbol, reason and evidence.
+#   3. Change status to "active".
+#
+# WhyGuard ignores this template: only contracts with status "active" are matched, and
+# the id below is a placeholder.
+
+id: EXAMPLE
+version: 1
+status: draft
+
+# Which code this decision protects. Paths are relative to the repository root.
+scope:
+  files:
+    - src/path/to/file.ts
+  symbols:
+    - functionName
+
+# WHY the behavior exists. Write the incident, not the implementation.
+reason: >
+  Describe the problem this code prevents. For example: clients retry checkout
+  requests when the payment gateway times out, so without a guard a retry creates a
+  second order and charges the customer twice.
+
+# The behavior that must survive any refactor. State it as an observable property,
+# never as "keep these lines" — a rewrite that preserves the property is fine.
+must_preserve:
+  - One idempotency key creates at most one order.
+
+# Where the reason is documented. These become the evidence trail on every finding.
+evidence:
+  - type: issue
+    id: "481"
+  - type: pull_request
+    id: "493"
+
+# Tests that prove the property. A change with an equivalent regression test is not
+# blocked, so listing these here is how a safe refactor gets through.
+required_tests:
+  - tests/payments/idempotency.test.ts
+
+# When this decision stops being true. Documenting the exit condition keeps the
+# contract from outliving the reason it was written for.
+expires_when:
+  - Every supported payment provider guarantees server-side idempotency.
+
+owners:
+  - your-team

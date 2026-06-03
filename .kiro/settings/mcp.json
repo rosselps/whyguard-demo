@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "whyguard": {
+      "command": "node",
+      "args": [
+        "C:/Users/rosselps/Documents/project/code/tools/WhyGuard/whyguard/apps/mcp-server/dist/index.js"
+      ],
+      "env": {
+        "WHYGUARD_REPO_ROOT": "C:/Users/rosselps/Documents/project/code/tools/WhyGuard/whyguard-demo"
+      },
+      "disabled": false,
+      "autoApprove": [],
+      "disabledTools": []
+    }
+  }
+}

@@ -1,0 +1,35 @@
+id: gateway-retry-interval
+version: 1
+status: active
+
+scope:
+  files:
+    - src/payments.ts
+  symbols:
+    - capturePayment
+    - RETRY_BACKOFF_MS
+
+reason: >
+  The gateway treats two attempts sent less than 2000ms apart as independent calls and
+  sometimes captures both. Their support confirmed 2000ms as the minimum interval. So
+  the backoff is a constraint imposed by the provider, not a latency knob: lowering it
+  reintroduces the duplicate charge from issue 1 through a different path.
+
+must_preserve:
+  - Consecutive capture attempts are at least 2000ms apart.
+  - Only errors the gateway marked retryable are retried.
+
+evidence:
+  - type: issue
+    id: "2"
+  - type: issue
+    id: "1"
+
+required_tests:
+  - src/orders.test.ts
+
+expires_when:
+  - The gateway documents a lower minimum interval, in writing.
+
+owners:
+  - checkout

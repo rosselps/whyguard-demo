@@ -1,0 +1,34 @@
+id: order-idempotency
+version: 1
+status: active
+
+scope:
+  files:
+    - src/orders.ts
+  symbols:
+    - createOrder
+
+reason: >
+  Customers who double-clicked Pay, or whose mobile client retried after a timeout,
+  were charged twice for the same cart: 27 confirmed duplicates in one week and 3
+  chargebacks, each refunded by hand. createOrder had no idempotency, so two requests
+  carrying the same client key both created an order and both captured a payment.
+
+must_preserve:
+  - One idempotency key creates at most one order.
+  - A repeated request returns the original order instead of capturing again.
+
+evidence:
+  - type: issue
+    id: "1"
+  - type: commit
+    id: "4a62265"
+
+required_tests:
+  - src/orders.test.ts
+
+expires_when:
+  - The payment gateway guarantees idempotency server-side for the keys we send.
+
+owners:
+  - checkout
