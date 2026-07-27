@@ -2,11 +2,7 @@ export type CaptureResult = { captured: boolean; attempts: number };
 
 export const MAX_ATTEMPTS = 3;
 
-/**
- * Gateway minimum. Below 2000ms the gateway treats the retry as an independent call and
- * can capture twice. This is a constraint they confirmed, not a tuning knob.
- */
-export const RETRY_BACKOFF_MS = 2000;
+export const RETRY_BACKOFF_MS = 250;
 
 export class GatewayError extends Error {
   constructor(
